@@ -1,0 +1,95 @@
+<launch>
+
+    <!-- TF publisher -->
+	<include file="$(find rc_car_description)/launch/tf_static.launch"/>
+	<!-- RPLIDAR Launch -->
+	<include file="$(find rplidar_ros)/launch/rplidar.launch"/>
+
+	<!-- ***___Odometry___*** -->
+	<!-- BMI160 IMU Publisher-->
+	<node pkg="self_driving_rc_car" type="imu_bmi160_filtered_publisher" name="imu_publisher"></node>
+	<!-- Wheel Encoder -->
+    <node pkg="self_driving_rc_car" type="wheel_encoder.py" name="wheel_encoder" respawn="true"></node>
+	<!-- EKF -->
+	<node pkg="self_driving_rc_car" type="ext_kf" name="ext_kf"></node>
+
+
+    <!-- Run the map server -->
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find rc_car_2dnav)/maps/home_small.yaml"/>
+
+    <!-- Run AMCL -->
+    <!-- <include file="$(find amcl)/examples/amcl_diff.launch"/> -->
+
+    <node pkg="amcl" type="amcl" name="amcl" output="screen">
+    <!-- Publish scans from best pose at a max of 10 Hz -->
+      <param name="odom_model_type" value="diff"/>
+      <param name="base_frame_id" value="base_link"/>
+      <!-- <param name="odom_alpha5" value="0.1"/> -->
+      <param name="transform_tolerance" value="0.2" />
+      <param name="gui_publish_rate" value="10.0"/>
+      <param name="laser_max_beams" value="30"/>
+      <param name="min_particles" value="500"/>
+      <param name="max_particles" value="5000"/>
+      <param name="kld_err" value="0.05"/>
+      <param name="kld_z" value="0.99"/>
+      <!-- Specifies the expected noise in odometry's rotation estimate from the rotational component of the robot's motion. -->
+      <param name="odom_alpha1" value="0.6"/> <!--0.8-->
+      <!-- Specifies the expected noise in odometry's rotation estimate from translational component of the robot's motion. -->
+      <param name="odom_alpha2" value="0.3"/> <!--0.6-->
+      <!-- translation std dev, m -->
+      <!-- Specifies the expected noise in odometry's translation estimate from the translational component of the robot's motion. -->
+      <param name="odom_alpha3" value="0.1"/> <!--0.2-->
+      <!-- Specifies the expected noise in odometry's translation estimate from the rotational component of the robot's motion. -->
+      <param name="odom_alpha4" value="0.3"/> <!--0.6-->
+
+      <param name="laser_z_hit" value="0.5"/>
+      <param name="laser_z_short" value="0.05"/>
+      <param name="laser_z_max" value="0.05"/>
+      <param name="laser_z_rand" value="0.5"/>
+      <param name="laser_sigma_hit" value="0.2"/>
+      <param name="laser_lambda_short" value="0.1"/>
+      <param name="laser_lambda_short" value="0.1"/>
+      <param name="laser_model_type" value="likelihood_field"/>
+      <!-- <param name="laser_model_type" value="beam"/> -->
+      <param name="laser_likelihood_max_dist" value="2.0"/>
+      <param name="update_min_d" value="0.1"/>  <!-- 0.2 -->
+      <param name="update_min_a" value="0.2"/> <!-- 0.5 -->
+      <param name="odom_frame_id" value="odom"/>
+      <param name="resample_interval" value="1"/>
+      <param name="transform_tolerance" value="0.2"/>
+      <param name="recovery_alpha_slow" value="0.0"/>
+      <param name="recovery_alpha_fast" value="0.0"/>
+    </node>   
+	
+    <!-- <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" respawn="true">
+	 	<param name="map_update_interval" value="2.0"/>
+		<param name="maxUrange" value="5.0"/>
+		<param name="xmin" value="-5.0"/>
+		<param name="ymin" value="-5.0"/>
+		<param name="xmax" value="5.0"/>
+		<param name="ymax" value="5.0"/>
+		<param name="delta" value="0.05"/>
+		<param name="maxRange" value="6.0"/>
+	</node> -->
+
+    <!-- Get jostick input--> 
+	<node respawn="true" pkg="joy" type="joy_node" name="turtle_joy" >
+		<param name="dev" type="string" value="/dev/input/js0" />		
+	</node>
+	<!-- Run with jostick-->    
+	<!-- <node pkg="self_driving_rc_car" type="joystick_controller" name="teleop_rc_car" respawn="true"></node> --> -->
+    <!-- <node pkg="self_driving_rc_car" type="dbw.py" name="dbw_listener" respawn="true"></node> -->
+
+    <node pkg="move_base" type="move_base" name="move_base" respawn="false">
+        <rosparam file="$(find rc_car_2dnav)/config/costmap_common_params.yaml" command="load" ns="global_costmap"/>
+        <rosparam file="$(find rc_car_2dnav)/config/costmap_common_params.yaml" command="load" ns="local_costmap"/>
+        <rosparam file="$(find rc_car_2dnav)/config/local_costmap_params.yaml" command="load"/>
+        <rosparam file="$(find rc_car_2dnav)/config/global_costmap_params.yaml" command="load"/>
+        <rosparam file="$(find rc_car_2dnav)/config/base_local_planner_params.yaml" command="load"/>
+
+        <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS"/>
+        <param name="controller_frequency" value="10.0"/>
+    </node>
+    
+</launch>
+        

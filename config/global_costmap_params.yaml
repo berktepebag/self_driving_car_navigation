@@ -1,0 +1,5 @@
+global_costmap:
+  global_frame: map
+  robot_base_frame: base_link
+  update_frequency: 10.0 #5.0 # Hz, costmap runs update loop
+  static_map: true # Using an existing map(true) or not(false)
