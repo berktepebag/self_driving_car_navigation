@@ -113,7 +113,7 @@ int main(int argc, char **argv)
 
     while(ros::ok())
     {
-        teleop_cmd_pub.publish(tebPF.calculate_ackermann_msg());
+        // teleop_cmd_pub.publish(tebPF.calculate_ackermann_msg());
 
         ros::spinOnce();  
         loop_rate.sleep();

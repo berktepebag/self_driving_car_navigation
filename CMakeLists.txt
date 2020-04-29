@@ -15,6 +15,12 @@ find_package(catkin REQUIRED COMPONENTS
   ackermann_msgs
   rosbag
   message_generation
+  dynamic_reconfigure
+)
+
+#add dynamic reconfigure api
+generate_dynamic_reconfigure_options(
+  cfg/Commands.cfg
 )
 
 catkin_package(
@@ -35,6 +41,13 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+add_executable(command_controller src/command_controller.cpp)
+target_link_libraries(command_controller 
+${catkin_LIBRARIES} 
+)
+add_dependencies(command_controller ${PROJECT_NAME}_gencfg)
+
+
 add_executable(pi_controller src/pi_controller.cpp)
 target_link_libraries(pi_controller 
 ${catkin_LIBRARIES} 
@@ -44,3 +57,4 @@ add_executable(trajectory_utilities src/trajectory_utilities.cpp)
 target_link_libraries(trajectory_utilities 
 ${catkin_LIBRARIES} 
 )
+
