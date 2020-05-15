@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   rosbag
   message_generation
   dynamic_reconfigure
+  visualization_msgs
 )
 
 #add dynamic reconfigure api
@@ -58,3 +59,14 @@ target_link_libraries(trajectory_utilities
 ${catkin_LIBRARIES} 
 )
 
+add_executable(mpc src/mpc.cpp)
+target_link_libraries(mpc 
+${catkin_LIBRARIES}
+ipopt 
+)
+
+add_executable(cpp_ipopt_demo src/cpp_ipopt_demo.cpp)
+target_link_libraries(cpp_ipopt_demo 
+${catkin_LIBRARIES}
+ipopt 
+)
