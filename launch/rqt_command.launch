@@ -1,0 +1,26 @@
+<launch>
+
+    <!-- TF publisher -->
+	<include file="$(find rc_car_description)/launch/tf_static.launch"/>
+	<!-- RPLIDAR Launch -->
+	<!-- <include file="$(find rplidar_ros)/launch/rplidar.launch"/> -->
+
+	<!-- ***___Odometry___*** -->
+	<!-- BMI160 IMU Publisher-->
+	<node pkg="self_driving_rc_car" type="imu_bmi160_filtered_publisher" name="imu_publisher"></node>
+	<!-- Wheel Encoder -->
+    <node pkg="self_driving_rc_car" type="wheel_encoder.py" name="wheel_encoder" respawn="true"></node>
+	<!-- EKF -->
+	<node pkg="self_driving_rc_car" type="ext_kf" name="ext_kf"></node>
+    <!-- Rqt Params Server -->
+    <node pkg="rc_car_2dnav" type="dynamic_param_cmd" name="dynamic_param_cmd"/>
+
+    <!-- Run the map server -->
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find rc_car_2dnav)/maps/home_small.yaml"/>
+
+    <!-- Run AMCL -->
+    <!-- <include file="$(find amcl)/examples/amcl_diff.launch"/> -->
+
+   
+</launch>
+        

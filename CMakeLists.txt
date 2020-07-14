@@ -25,8 +25,8 @@ generate_dynamic_reconfigure_options(
 )
 
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES rc_car_2dnav
+  # INCLUDE_DIRS include
+  # LIBRARIES rc_car_2dnav
   CATKIN_DEPENDS roscpp std_msgs nav_msgs geometry_msgs
   DEPENDS system_lib
 )
@@ -59,7 +59,7 @@ target_link_libraries(trajectory_utilities
 ${catkin_LIBRARIES} 
 )
 
-add_executable(mpc src/mpc.cpp)
+add_executable(mpc src/mpc.cpp src/MPC.cpp src/path_utilities.cpp)
 target_link_libraries(mpc 
 ${catkin_LIBRARIES}
 ipopt 
